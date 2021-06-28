@@ -1,17 +1,33 @@
 <template>
-  <svg id="svg" ref="panel" preserveAspectRatio="xMidYMid meet"></svg>
+  <div ref="svg-parent" class="flex w-full items-center justify-center">
+    <svg
+      id="svg"
+      ref="panel"
+      version="1.1"
+      xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="slice"
+    ></svg>
+  </div>
 </template>
 
 <script>
+// @ts-nocheck
 export default {
   name: 'Panel',
+  props: {
+    color: {
+      type: String,
+      default: '#ffff00',
+    },
+  },
   data() {
     return {
       config: null,
       s: null,
       points: new Map(),
       lines: new Map(),
-      pointObjects: new Map()
+      pointObjects: new Map(),
+      setPath: [],
     }
   },
   async mounted() {
@@ -32,24 +48,31 @@ export default {
     this.drawPanel()
     this.updatePanel()
 
-
     const bbox = this.s.bbox()
 
     const width = bbox.x + bbox.width + bbox.x
     const height = bbox.y + bbox.height + bbox.y
 
-    this.s.width(width > window.screen.width ? window.screen.width : width)
-    this.s.height(height > window.screen.height ? window.screen.height : height)
+    // const parentEl = this.$refs['svg-parent'].getBoundingClientRect()
+    // const elWidth = parentEl.width
+    // const elHeight = parentEl.height
 
+    this.s.size(width, height)
+    this.s.viewbox(0, 0, width, height)
+
+    // this.s.scale(elWidth / width)
   },
   methods: {
+    updatePath(path) {
+      this.setPath = path
+    },
     refresh() {
       this.s.clear()
       this.lines = new Map()
       this.pointObjects = new Map()
       this.drawPanel()
       this.updatePanel()
-      this.path(this.$store.state.path.setPath)
+      this.path(this.setPath, this.color)
     },
     drawPanel() {
       this.points.forEach((point, key) => {
@@ -242,6 +265,24 @@ export default {
 
         this.pointObjects.set(key, rect)
       })
+
+      this.config.signals.forEach((signal) => {
+        const right =
+          this.points.get(signal.ahead.switch.toString()).position.x >
+          signal.position.x
+        this.s
+          .text(right ? signal.id.toString() + '→' : '←' + signal.id.toString())
+          .move(signal.position.x * 50, signal.position.y * 50 - 30)
+          .font({
+            fill: '#000',
+            family: 'Arial',
+            weight: 700,
+            size: '16px',
+          })
+          .attr({
+            'text-decoration': 'underline',
+          })
+      })
     },
     drawNeighbor(s, point, neighbor, pointName, neighborName) {
       let pointLineData = this.lines.get(pointName)
@@ -257,23 +298,30 @@ export default {
         neighborLineData = this.lines.get(neighborName)
       }
 
-      if (
-        !pointLineData.neighbors.includes(neighborName) &&
-        !neighborLineData.neighbors.includes(pointName)
-      ) {
-        const line = s.line(
-          point.position.x * 50,
-          point.position.y * 50,
-          neighbor.position.x * 50,
-          neighbor.position.y * 50
-        )
-        line.stroke({
+      // if (
+      //   !pointLineData.neighbors.includes(neighborName) &&
+      //   !neighborLineData.neighbors.includes(pointName)
+      // ) {
+      const line = s.line(
+        point.position.x * 50,
+        point.position.y * 50,
+        (neighbor.position.x * 50) / 2 + (point.position.x * 50) / 2,
+        (neighbor.position.y * 50) / 2 + (point.position.y * 50) / 2
+      )
+      line
+        .stroke({
           color: 'black',
-          width: 15,
+          width: 16,
+          opacity: 1,
+          'stroke-opacity': 1,
         })
-        pointLineData.neighbors.push(neighborName)
-        pointLineData.lineObjects.push(line)
-      }
+        .attr({
+          'stroke-opacity': 1,
+        })
+
+      pointLineData.neighbors.push(neighborName)
+      pointLineData.lineObjects.push(line)
+      // }
     },
     getName(node) {
       return node.type === 'switch'
@@ -282,24 +330,24 @@ export default {
         ? node.name
         : `PT${node.id}`
     },
-    path(nodes) {
-      this.$store.commit('path/set', nodes)
+    path(nodes, color) {
+      this.setPath = nodes
       nodes.forEach((node, i) => {
         const lineNode = this.lines.get(node)
         const nextNode = this.lines.get(nodes[i + 1])
 
-        this.pointObjects.get(node).fill('#FF0000').stroke({ color: '#FF0000' })
+        this.pointObjects.get(node).fill(color).stroke({ color })
 
         if (!nextNode) return
 
         if (lineNode.neighbors.includes(nodes[i + 1])) {
           const neighborIndex = lineNode.neighbors.indexOf(nodes[i + 1])
-          lineNode.lineObjects[neighborIndex].stroke({ color: '#FF0000' })
+          lineNode.lineObjects[neighborIndex].stroke({ color })
         }
 
         if (nextNode.neighbors.includes(node)) {
           const neighborIndex = nextNode.neighbors.indexOf(node)
-          nextNode.lineObjects[neighborIndex].stroke({ color: '#FF0000' })
+          nextNode.lineObjects[neighborIndex].stroke({ color })
         }
       })
     },
@@ -313,7 +361,7 @@ export default {
     updatePanel() {
       this.$axios.$get('/switches').then((data) => {
         data.forEach((node) => {
-          if (this.$store.state.path.setPath.includes(node.id.toString())) return
+          if (this.setPath.includes(node.id.toString())) return
 
           const state = node.state === 0 ? 'minus' : 'plus'
 
@@ -343,7 +391,10 @@ export default {
             ].stroke({ color: '#009933' })
           }
 
-          if (neighborLines.neighbors.includes(node.id.toString())) {
+          if (
+            neighborLines.neighbors.includes(node.id.toString()) &&
+            this.points.get(neighborNode).type === 'point'
+          ) {
             neighborLines.lineObjects[
               neighborLines.neighbors.indexOf(node.id.toString())
             ].stroke({ color: '#009933' })

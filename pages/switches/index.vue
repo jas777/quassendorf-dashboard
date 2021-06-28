@@ -67,7 +67,7 @@
       </div>
     </modal>
     <div class="w-full flex items-center justify-around">
-      <Panel ref="panel"></Panel>
+      <Panel ref="panel" color="#ff0000"></Panel>
     </div>
     <div class="w-full">
       <h1 class="text-5xl">Ustawianie przebiegu</h1>
@@ -159,7 +159,7 @@
           <div
             class="max-w-sm rounded overflow-hidden shadow-lg bg-gray-200 flex flex-row cursor-pointer select-none"
             @click="
-              !$store.state.path.setPath.includes(s.id.toString())
+              !currPath.includes(s.id.toString())
                 ? change(s.id, s.state == 0 ? 1 : 0)
                 : null
             "
@@ -172,25 +172,19 @@
             </div>
             <div class="w-20 items-center align-middle m-auto text-center">
               <p
-                v-if="
-                  s.state == 0 &&
-                  !$store.state.path.setPath.includes(s.id.toString())
-                "
+                v-if="s.state == 0 && !currPath.includes(s.id.toString())"
                 class="text-red-400 font-extrabold text-6xl max-w-15"
               >
                 -
               </p>
               <p
-                v-if="
-                  s.state == 1 &&
-                  !$store.state.path.setPath.includes(s.id.toString())
-                "
+                v-if="s.state == 1 && !currPath.includes(s.id.toString())"
                 class="text-green-400 font-extrabold text-6xl max-w-15"
               >
                 +
               </p>
               <p
-                v-if="$store.state.path.setPath.includes(s.id.toString())"
+                v-if="currPath.includes(s.id.toString())"
                 class="text-orange-500 font-extrabold text-6xl max-w-15"
               >
                 <i class="fas fa-lock"></i>
@@ -213,12 +207,13 @@ export default Vue.extend({
   },
   async asyncData({ $axios }: any) {
     const toAdd = {
-      switches: [],
+      switches: [] as { id: string; state: number }[],
       points: [],
       pathChange: {
         from: '',
         to: '',
       },
+      path: [],
     }
     await $axios.$get('/switches').then((res) => {
       toAdd.switches = res
@@ -235,22 +230,23 @@ export default Vue.extend({
       switches: [],
       points: [],
       checkedPath: {},
+      currPath: [],
     }
   },
   methods: {
     fetchSwitches() {
       this.$axios.$get('/switches').then((res) => {
         this.switches = res
+        // @ts-ignore
+        this.$refs.panel.refresh()
       })
-      // @ts-ignore
-      this.$refs.panel.refresh()
       // @ts-ignore
       // this.$refs.panel.path(['3', '4', '5'])
     },
     change(id: number, to: 1 | 0) {
       this.$axios
         .$post(`/switches/${to === 0 ? 'minus' : 'plus'}/${id}`)
-        .catch((err) => console.log(err))
+        .catch((err) => {})
       this.fetchSwitches()
     },
     reset() {
@@ -283,7 +279,9 @@ export default Vue.extend({
           // @ts-ignore
           if (this.checkedPath.length < 2) {
             // @ts-ignore
-            this.$refs.panel.path(this.checkedPath.queue[0])
+            this.$refs.panel.updatePath(this.checkedPath.queue[0])
+            this.currPath = this.checkedPath.queue[0]
+            // @ts-ignore
           }
           if (setFirst) {
             this.$axios.$post(`/steps/${res.queue_id}/next`)
@@ -294,7 +292,8 @@ export default Vue.extend({
     },
     resetPath() {
       // @ts-ignore
-      this.$store.commit('path/clear')
+      this.$refs.panel.updatePath([])
+      this.currPath = []
       // @ts-ignore
       this.$refs.panel.refresh()
     },

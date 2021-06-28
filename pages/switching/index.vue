@@ -1,5 +1,8 @@
 <template>
   <div class="flex flex-col m-8">
+    <div class="w-full flex items-center justify-around">
+      <Panel ref="panel" color="#3498db"></Panel>
+    </div>
     <div class="inline-flex w-full">
       <h1 class="text-5xl">Manewry</h1>
     </div>
@@ -18,6 +21,12 @@
             </p>
           </div>
           <div class="flex justify-between mt-8">
+            <button
+              class="ml-2 bg-gray-500 hover:bg-gray-700 text-white text-lg font-bold py-2 px-4 rounded"
+              @click="show(entry[1][0])"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
             <button
               class="inline-flex bg-green-500 hover:bg-green-700 text-white text-lg font-bold py-2 px-4 rounded"
               @click="next(entry[0])"
@@ -38,8 +47,12 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import Panel from '~/components/Panel.vue'
 
 export default Vue.extend({
+  components: {
+    Panel,
+  },
   async asyncData({ $axios }: any) {
     const toAdd = {
       queue: new Map<number, string>(),
@@ -54,7 +67,7 @@ export default Vue.extend({
   data() {
     return {
       queue: new Map(),
-      cache: new Map()
+      cache: new Map(),
     }
   },
   methods: {
@@ -67,6 +80,12 @@ export default Vue.extend({
     next(id: number): void {
       this.$axios.$post(`/steps/${id}/next`).catch(() => {})
       this.fetchSteps()
+    },
+    show(path: string[]) {
+      // @ts-ignore
+      this.$refs.panel.updatePath(path)
+      // @ts-ignore
+      this.$refs.panel.refresh()
     },
   },
 })
