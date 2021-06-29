@@ -78,7 +78,6 @@
         <p class="mr-6 text-xl font-bold">Od</p>
         <div class="relative">
           <select
-            id="grid-state"
             v-model="pathChange.from"
             class="block appearance-none w-full bg-gray-300 border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
           >
@@ -107,7 +106,6 @@
         <p class="mr-6 text-xl font-bold">do</p>
         <div class="relative">
           <select
-            id="grid-state"
             v-model="pathChange.to"
             class="block appearance-none w-full bg-gray-300 border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
           >
@@ -160,7 +158,7 @@
             class="max-w-sm rounded overflow-hidden shadow-lg bg-gray-200 flex flex-row cursor-pointer select-none"
             @click="
               !currPath.includes(s.id.toString())
-                ? change(s.id, s.state == 0 ? 1 : 0)
+                ? change(s.id, s.state === 0 ? 1 : 0)
                 : null
             "
           >
@@ -168,17 +166,23 @@
               <p class="font-bold text-5xl mr-3">
                 {{ s.id }}
               </p>
-              <img src="/switch.svg" height="44px" width="88px" class="mt-2" />
+              <img
+                :alt="s.id"
+                src="/switch.svg"
+                height="44px"
+                width="88px"
+                class="mt-2"
+              />
             </div>
             <div class="w-20 items-center align-middle m-auto text-center">
               <p
-                v-if="s.state == 0 && !currPath.includes(s.id.toString())"
+                v-if="s.state === 0 && !currPath.includes(s.id.toString())"
                 class="text-red-400 font-extrabold text-6xl max-w-15"
               >
                 -
               </p>
               <p
-                v-if="s.state == 1 && !currPath.includes(s.id.toString())"
+                v-if="s.state === 1 && !currPath.includes(s.id.toString())"
                 class="text-green-400 font-extrabold text-6xl max-w-15"
               >
                 +
@@ -227,8 +231,13 @@ export default Vue.extend({
   },
   data() {
     return {
-      switches: [],
+      switches: [] as { id: number; state: number }[],
       points: [],
+      pathChange: {
+        from: '',
+        to: '',
+      },
+      path: [],
       checkedPath: {},
       currPath: [],
     }
@@ -246,11 +255,11 @@ export default Vue.extend({
     change(id: number, to: 1 | 0) {
       this.$axios
         .$post(`/switches/${to === 0 ? 'minus' : 'plus'}/${id}`)
-        .catch((err) => {})
+        .catch(() => {})
       this.fetchSwitches()
     },
     reset() {
-      this.$axios.post(`/reset`).catch((err) => console.log(err))
+      this.$axios.post(`/reset`).catch(() => {})
       this.resetPath()
       this.fetchSwitches()
     },
@@ -260,13 +269,13 @@ export default Vue.extend({
         .then((res) => {
           this.checkedPath = res
           if (res.length === 1) {
-            this.$modal
-              .show('confirmation', {}, { height: 'auto' })
-              .catch(() => {})
+            this.$modal.show('confirmation', {}, { height: 'auto' })
           } else {
-            this.$modal
-              .show('switching-confirmation', {}, { height: 'fit-content' })
-              .catch(() => {})
+            this.$modal.show(
+              'switching-confirmation',
+              {},
+              { height: 'fit-content' }
+            )
           }
         })
         .catch(() => {})

@@ -72,13 +72,13 @@ export default {
   publicRuntimeConfig: {
     axios: {
       browserBaseURL: process.env.API_URL,
-    }
+    },
   },
 
   privateRuntimeConfig: {
     axios: {
       baseURL: process.env.API_URL,
-    }
+    },
   },
   /*
    ** Build configuration

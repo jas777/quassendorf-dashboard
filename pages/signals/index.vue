@@ -10,7 +10,6 @@
           <p class="mr-6 text-xl font-bold">Semafor</p>
           <div class="relative">
             <select
-              id="grid-state"
               v-model="changeForm.signal"
               class="block appearance-none w-full bg-gray-300 border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
             >
@@ -39,7 +38,6 @@
           <p class="mr-6 text-xl font-bold">Cel</p>
           <div class="relative">
             <select
-              id="grid-state"
               v-model="changeForm.point"
               class="block appearance-none w-full bg-gray-300 border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
             >
@@ -87,19 +85,25 @@
               <h1 class="text-gray-700 text-base font-semibold">
                 Podawany sygnał
               </h1>
-              <p v-if="signal.aspect == 0" class="font-semibold text-green-400">
+              <p
+                v-if="signal.aspect === 0"
+                class="font-semibold text-green-400"
+              >
                 Wolna droga
               </p>
-              <p v-if="signal.aspect == 1" class="font-semibold text-green-400">
+              <p
+                v-if="signal.aspect === 1"
+                class="font-semibold text-green-400"
+              >
                 Wolna droga (40km/h)
               </p>
               <p
-                v-if="signal.aspect == 2"
+                v-if="signal.aspect === 2"
                 class="font-semibold text-yellow-600"
               >
                 Wolna droga, następny stój
               </p>
-              <p v-if="signal.aspect == 3" class="font-semibold text-red-400">
+              <p v-if="signal.aspect === 3" class="font-semibold text-red-400">
                 Stój!
               </p>
               <div v-if="signal.repeaters.length > 0" class="mt-3">
@@ -159,7 +163,7 @@ export default Vue.extend({
               this.signals = res
             })
           })
-          .catch((err) => console.log(err))
+          .catch(() => {})
       } else {
         this.$axios
           .$post(`/signals/close/${this.changeForm.signal}`)
@@ -168,7 +172,7 @@ export default Vue.extend({
               this.signals = res
             })
           })
-          .catch((err) => console.log(err))
+          .catch(() => {})
       }
     },
   },

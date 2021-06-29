@@ -27,12 +27,12 @@ module.exports = {
       transitionDuration: {
         // defaults to these values
         default: '250ms',
-        '0': '0ms',
-        '100': '100ms',
-        '250': '250ms',
-        '500': '500ms',
-        '750': '750ms',
-        '1000': '1000ms',
+        0: '0ms',
+        100: '100ms',
+        250: '250ms',
+        500: '500ms',
+        750: '750ms',
+        1000: '1000ms',
       },
       transitionTimingFunction: {
         // defaults to these values
@@ -46,12 +46,12 @@ module.exports = {
       transitionDelay: {
         // defaults to these values
         default: '0ms',
-        '0': '0ms',
-        '100': '100ms',
-        '250': '250ms',
-        '500': '500ms',
-        '750': '750ms',
-        '1000': '1000ms',
+        0: '0ms',
+        100: '100ms',
+        250: '250ms',
+        500: '500ms',
+        750: '750ms',
+        1000: '1000ms',
       },
       willChange: {
         // defaults to these values

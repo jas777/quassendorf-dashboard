@@ -37,9 +37,7 @@
             class="block mt-4 mr-8 align-baseline text-xl p-1 px-2 no-underline menu-element wbm sm:inline-block sm:mt-0 hover:text-white hover:bg-black transition-all duration-500"
             @click="startLoading"
           >
-            <div>
-              rozjazdy
-            </div>
+            <div>rozjazdy</div>
           </NuxtLink>
           <a
             href="/signals"
@@ -52,18 +50,14 @@
             class="block mt-4 mr-8 align-baseline text-xl p-1 px-2 no-underline menu-element wbm sm:inline-block sm:mt-0 hover:text-white hover:bg-black transition-all duration-500"
             @click="startLoading"
           >
-            <div>
-              manewry
-            </div>
+            <div>manewry</div>
           </NuxtLink>
           <NuxtLink
             to="/lighting"
             class="block mt-4 mr-8 align-baseline text-xl p-1 px-2 no-underline menu-element wbm sm:inline-block sm:mt-0 hover:text-white hover:bg-black transition-all duration-500"
             @click="startLoading"
           >
-            <div>
-              oświetlenie
-            </div>
+            <div>oświetlenie</div>
           </NuxtLink>
         </div>
       </div>

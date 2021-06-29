@@ -58,7 +58,7 @@ export default Vue.extend({
       queue: new Map<number, string>(),
       cache: new Map<number, string>(),
     }
-    await $axios.$get('/queue').then((res) => {
+    await $axios.$get('/queue').then((res: { queue: any; cache: any }) => {
       toAdd.queue = new Map(Object.entries(res.queue)) as any
       toAdd.cache = new Map(Object.entries(res.cache)) as any
     })
