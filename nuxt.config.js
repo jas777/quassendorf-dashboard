@@ -1,5 +1,6 @@
-export default {
-  mode: 'universal',
+import { defineNuxtConfig } from '@nuxt/bridge'
+
+export default defineNuxtConfig({
   /*
    ** Headers of the page
    */
@@ -18,8 +19,7 @@ export default {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
       {
         rel: 'stylesheet',
-        href:
-          'https://fonts.googleapis.com/css2?family=Open+Sans&family=Roboto:wght@300;400;500;700;900&display=swap',
+        href: 'https://fonts.googleapis.com/css2?family=Open+Sans&family=Roboto:wght@300;400;500;700;900&display=swap',
       },
     ],
     script: [
@@ -39,12 +39,11 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: ['~/plugins/modal.js', '~/plugins/svg.js'],
+  plugins: ['~/plugins/modal.js', '~/plugins/svg.ts'],
   /*
    ** Nuxt.js dev-modules
    */
   buildModules: [
-    '@nuxt/typescript-build',
     // Doc: https://github.com/nuxt-community/stylelint-module
     '@nuxtjs/stylelint-module',
     // Doc: https://github.com/nuxt-community/nuxt-tailwindcss
@@ -60,7 +59,6 @@ export default {
     // Doc: https://github.com/nuxt-community/dotenv-module
     '@nuxtjs/dotenv',
   ],
-  auth: {},
   /*
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options
@@ -84,6 +82,11 @@ export default {
    ** Build configuration
    */
   build: {
+    postcss: {
+      autoprefixer: {
+        grid: true,
+      },
+    },
     /*
      ** You can extend webpack config here
      */
@@ -93,4 +96,4 @@ export default {
     host: '0.0.0.0',
     port: 80,
   },
-}
+})

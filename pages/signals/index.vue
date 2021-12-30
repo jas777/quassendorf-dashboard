@@ -1,5 +1,8 @@
 <template>
   <div class="flex flex-col m-8">
+    <div class="w-full flex items-center justify-around">
+      <Panel ref="panel" color="#3498db"></Panel>
+    </div>
     <div class="w-full">
       <h1 class="text-5xl left">Podawanie sygnału</h1>
       <hr />
@@ -126,17 +129,21 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import Panel from '~/components/Panel.vue'
 
 export default Vue.extend({
+  components: {
+    Panel,
+  },
   async asyncData({ $axios }: any) {
     const toAdd = {
       signals: [],
       points: [],
     }
-    await $axios.$get('/signals').then((res) => {
+    await $axios.$get('/signals').then((res: any) => {
       toAdd.signals = res
     })
-    await $axios.$get('/points').then((res) => {
+    await $axios.$get('/points').then((res: any) => {
       toAdd.points = res
     })
     return toAdd
@@ -151,6 +158,12 @@ export default Vue.extend({
       },
     }
   },
+  mounted() {
+    this.$axios.$get('/currentPath').then((res: string[]) => {
+      ;(this as any).$refs.panel.updatePath(res)
+      ;(this as any).$refs.panel.refresh()
+    })
+  },
   methods: {
     submitChange(to: string) {
       if (to === 'allow') {
@@ -159,7 +172,7 @@ export default Vue.extend({
             to: this.changeForm.point,
           })
           .then(() => {
-            this.$axios.$get('/signals').then((res) => {
+            this.$axios.$get('/signals').then((res: any) => {
               this.signals = res
             })
           })
@@ -168,7 +181,7 @@ export default Vue.extend({
         this.$axios
           .$post(`/signals/close/${this.changeForm.signal}`)
           .then(() => {
-            this.$axios.$get('/signals').then((res) => {
+            this.$axios.$get('/signals').then((res: any) => {
               this.signals = res
             })
           })

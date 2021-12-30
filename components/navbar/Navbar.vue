@@ -67,7 +67,7 @@
 
 <script>
 export default {
-  name: 'Navbar',
+  name: 'DashboardNavbar',
   data() {
     return {
       open: false,
@@ -87,26 +87,5 @@ export default {
 <style>
 header {
   align-items: end;
-}
-
-@media only screen and (min-width: 768px) {
-  .menu-element.active::after {
-    content: '';
-    display: block;
-    position: inherit;
-    height: 2px;
-    bottom: 0;
-    left: 20px;
-    right: 20px;
-    box-shadow: 0 -4px 12px 0 #7289da;
-    -webkit-box-shadow: 0 -4px 12px 0 #7289da;
-    background: #7289da;
-    -webkit-transform: translateY(16px);
-    -webkit-transition: -webkit-transform 0.125s;
-    transform: none;
-    transition: -webkit-transform 0.125s;
-    transition: transform 0.125s;
-    transition: transform 0.125s, -webkit-transform 0.125s;
-  }
 }
 </style>

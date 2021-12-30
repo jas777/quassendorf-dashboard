@@ -3,7 +3,6 @@
     <svg
       id="svg"
       ref="panel"
-      version="1.1"
       xmlns="http://www.w3.org/2000/svg"
       preserveAspectRatio="slice"
     ></svg>
@@ -11,9 +10,10 @@
 </template>
 
 <script>
-// @ts-nocheck
-export default {
-  name: 'Panel',
+import Vue from 'vue'
+
+export default Vue.extend({
+  name: 'StationPanel',
   props: {
     color: {
       type: String,
@@ -213,11 +213,11 @@ export default {
 
           const neighborRight = this.config.nodes.find(
             // eslint-disable-next-line eqeqeq
-            (p) => this.getName(p) == point.right
+            (p) => this.getName(p) === point.right
           )
           const neighborLeft = this.config.nodes.find(
             // eslint-disable-next-line eqeqeq
-            (p) => this.getName(p) == point.left
+            (p) => this.getName(p) === point.left
           )
 
           if (neighborRight && neighborLeft) {
@@ -403,5 +403,5 @@ export default {
       })
     },
   },
-}
+})
 </script>

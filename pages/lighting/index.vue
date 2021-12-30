@@ -44,15 +44,18 @@ export default Vue.extend({
   data() {
     return {
       switches: [],
+      nodes: [],
     }
   },
   methods: {
     toggle(lightNode: string) {
-      const node = this.nodes.find((n) => n.name === lightNode)
+      const node = (this as any).nodes.find((n: any) => n.name === lightNode)
 
       this.$axios
         .post(`/lighting/${node.name}/${node.active ? 'off' : 'on'}`)
-        .catch((err) => console.log(err))
+        // eslint-disable-next-line no-console
+        .catch((err) => console.error(err))
+      // TODO: Generics
       this.$axios.get('/lighting').then((res) => {
         this.nodes = res.data
       })

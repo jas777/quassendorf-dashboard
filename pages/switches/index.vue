@@ -202,6 +202,8 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable prettier/prettier */
+
 import Vue from 'vue'
 import Panel from '~/components/Panel.vue'
 
@@ -219,10 +221,10 @@ export default Vue.extend({
       },
       path: [],
     }
-    await $axios.$get('/switches').then((res) => {
+    await $axios.$get('/switches').then((res: any) => {
       toAdd.switches = res
     })
-    await $axios.$get('/points').then((res) => {
+    await $axios.$get('/points').then((res: any) => {
       toAdd.points = res.filter(
         (p: string | number) => !p.toString().endsWith('-S')
       )
@@ -242,10 +244,17 @@ export default Vue.extend({
       currPath: [],
     }
   },
+  mounted() {
+    this.$axios.$get('/currentPath').then((res: string[]) => {
+      (this as any).currPath = res;
+      (this as any).$refs.panel.updatePath(res);
+      (this as any).$refs.panel.refresh()
+    })
+  },
   methods: {
     fetchSwitches() {
       this.$axios.$get('/switches').then((res) => {
-        this.switches = res
+        ;(this as any).switches = res
         // @ts-ignore
         this.$refs.panel.refresh()
       })
@@ -254,20 +263,19 @@ export default Vue.extend({
     },
     change(id: number, to: 1 | 0) {
       this.$axios
-        .$post(`/switches/${to === 0 ? 'minus' : 'plus'}/${id}`)
-        .catch(() => {})
-      this.fetchSwitches()
+        .$post(`/switches/${to === 0 ? 'minus' : 'plus'}/${id}`);
+        (this as any).fetchSwitches()
     },
     reset() {
-      this.$axios.post(`/reset`).catch(() => {})
-      this.resetPath()
-      this.fetchSwitches()
+      this.$axios.post(`/reset`).catch(() => {});
+      (this as any).resetPath();
+      (this as any).fetchSwitches()
     },
     setPath(from: string, to: string): void {
       this.$axios
         .$post(`/check_path/${from}/${to}`)
         .then((res) => {
-          this.checkedPath = res
+          (this as any).checkedPath = res
           if (res.length === 1) {
             this.$modal.show('confirmation', {}, { height: 'auto' })
           } else {
@@ -288,23 +296,25 @@ export default Vue.extend({
           // @ts-ignore
           if (this.checkedPath.length < 2) {
             // @ts-ignore
-            this.$refs.panel.updatePath(this.checkedPath.queue[0])
-            this.currPath = this.checkedPath.queue[0]
+            this.$refs.panel.updatePath(this.checkedPath.queue[0]);
+            (this as any).currPath = (this as any).checkedPath.queue[0]
             // @ts-ignore
           }
           if (setFirst) {
-            this.$axios.$post(`/steps/${res.queue_id}/next`)
-            this.fetchSwitches()
+            this.$axios.$post(`/steps/${res.queue_id}/next`);
+            (this as any).fetchSwitches()
           }
         })
         .catch(() => {})
     },
     resetPath() {
-      // @ts-ignore
-      this.$refs.panel.updatePath([])
-      this.currPath = []
-      // @ts-ignore
-      this.$refs.panel.refresh()
+      this.$axios.$post('/resetPath').then((_res) => {
+        // @ts-ignore
+        this.$refs.panel.updatePath([]);
+        (this as any).currPath = [];
+        // @ts-ignore
+        this.$refs.panel.refresh()
+      })      
     },
   },
 })
